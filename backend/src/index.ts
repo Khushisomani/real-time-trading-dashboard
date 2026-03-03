@@ -6,6 +6,7 @@ import { WebSocketServer } from "ws";
 import { MarketData } from "./main/market/marketData.js";
 import { tickersRouter } from "./main/routes/tickers.js";
 import { historyRouter } from "./main/routes/history.js";
+import loginRouter from "./main/routes/login.js";
 import { WsHub } from "./main/ws/hub.js";
 
 const PORT = Number(process.env.PORT ?? 8080);
@@ -21,6 +22,7 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use("/api/tickers", tickersRouter(market));
 app.use("/api/history", historyRouter(market));
+app.use("/api/login", loginRouter);
 
 
 const server = http.createServer(app);
