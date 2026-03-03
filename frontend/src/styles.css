@@ -1,0 +1,126 @@
+:root {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    color: #111;
+    background: #f6f7fb;
+  }
+  
+  * { box-sizing: border-box; }
+  
+  .page {
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .title { font-size: 20px; font-weight: 700; }
+  .subtitle { font-size: 13px; color: #444; margin-top: 4px; }
+  
+  .pill {
+    background: white;
+    border: 1px solid #e3e6ef;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 14px;
+  }
+  
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+  
+  .card {
+    background: white;
+    border: 1px solid #e3e6ef;
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  
+  .cardTitle {
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  
+  .tickerList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .tickerRow {
+    width: 100%;
+    border: 1px solid #eef0f6;
+    background: #fbfbfd;
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    text-align: left;
+  }
+  
+  .tickerRow.active {
+    border-color: #cfd6ff;
+    background: #f2f4ff;
+  }
+  
+  .tickerSymbol { font-weight: 700; }
+  .tickerMeta { font-size: 12px; color: #555; margin-top: 4px; }
+  .tickerPrice { font-weight: 800; font-size: 16px; }
+  .tickerTs { font-size: 12px; color: #666; margin-top: 4px; }
+  
+  .pos { color: #0a7a2f; }
+  .neg { color: #b00020; }
+  
+  .chartHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+  }
+  
+  .chartSymbol { font-weight: 800; font-size: 16px; }
+  .chartPrice { font-weight: 900; font-size: 18px; }
+  
+  .chartWrap { width: 100%; }
+  .empty { padding: 18px; color: #555; }
+  
+  .banner {
+    background: #fff7df;
+    border: 1px solid #ffe39b;
+    padding: 10px 12px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+  .banner.error {
+    background: #ffe7ea;
+    border-color: #ffb6c1;
+  }
+  
+  .hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .footer {
+    margin-top: 14px;
+    font-size: 12px;
+    color: #666;
+  }
