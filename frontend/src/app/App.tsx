@@ -3,7 +3,12 @@ import Login from "./Login";
 import Dashboard from "./Dashboard";
 
 export default function App() {
- 
+  const [token, setToken] = useState<string | null>();
+
+
+  if (!token) return <Login onLogin={setToken} />;
+
+
   return <Dashboard />;
 }
 

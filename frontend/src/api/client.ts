@@ -38,5 +38,22 @@ export async function fetchHistory(symbol: TickerSymbol, limit = 120): Promise<P
     }
   }
 
-
-
+  export async function fetchLogin(username: string, password: string) {
+    const res = await fetch(`${API_BASE}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+    try {
+        const result = await res.json();
+        return result.token;
+    }
+    catch {
+        throw new Error("Invalid credentials")
+    }
+}
+  
+  export function wsUrl(): string {
+    const base = API_BASE.replace(/^http/, "ws");
+    return `${base}/ws`;
+  }
