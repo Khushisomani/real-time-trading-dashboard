@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: crypto-backend
-  namespace: crypto-dashboard
+  namespace: real-time-trading-dashboard
 spec:
   replicas: 2
   selector:
@@ -39,7 +39,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: crypto-backend-svc
-  namespace: crypto-dashboard
+  namespace: real-time-trading-dashboard
 spec:
   type: ClusterIP
   selector:

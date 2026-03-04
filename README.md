@@ -6,7 +6,7 @@ The system simulates a market data feed using a backend price engine and deliver
 
 ---
 
-# Project Overview
+# 1. Project Overview
 
 This project demonstrates:
 
@@ -15,8 +15,10 @@ This project demonstrates:
 • Alerting system based on price thresholds  
 • Backend caching for efficient historical data retrieval  
 • Clean separation between frontend and backend services  
+• The project has been pushed to github with 15+ commits
 
 The application simulates a trading dashboard similar to those used in financial platforms.
+
 
 ---
 
@@ -96,9 +98,26 @@ Backend
 - TypeScript
 - ws (WebSocket library)
 
+
 ---
 
-# Running the Project
+# 2. Assumptions & Trade-Offs
+
+### Simulated Market Data
+Prices are generated randomly rather than fetched from a real exchange API.
+
+### No Persistent Storage
+Market history is stored in memory and reset on server restart.
+
+### Single Backend Instance
+WebSocket alerts are stored in memory, so scaling would require shared storage.
+
+### Lightweight Authentication
+Authentication is mocked and not intended for production.
+
+---
+
+# 3. Instructions for Running Project
 
 ## 1. Start Backend
 cd backend
@@ -117,6 +136,8 @@ npm run dev
 
 Frontend runs at: http://localhost:5173
 
+Note: Mocked login credentials, Kindly directly click on login to view the dashboard
+
 # Running Tests
 
 Backend tests use **Vitest**.
@@ -124,46 +145,16 @@ Backend tests use **Vitest**.
 cd backend
 npm run test
 
-
 ---
 
-# Assumptions & Trade-Offs
-
-### Simulated Market Data
-Prices are generated randomly rather than fetched from a real exchange API.
-
-### No Persistent Storage
-Market history is stored in memory and reset on server restart.
-
-### Single Backend Instance
-WebSocket alerts are stored in memory, so scaling would require shared storage.
-
-### Lightweight Authentication
-Authentication is mocked and not intended for production.
-
----
-
-# Bonus Features Implemented
+# 4. Bonus Features Implemented
 
 ✔ Real-time WebSocket streaming  
 ✔ Live updating charts  
 ✔ Price alert system  
 ✔ Backend caching for history  
 ✔ WebSocket reconnection handling  
-✔ Mock authentication endpoint  
-
----
-
-# Future Improvements
-
-Possible improvements include:
-
-• Redis for distributed WebSocket alerts  
-• Real exchange integration (Binance / Coinbase)  
-• Persistent storage for historical data  
-• Authentication with JWT  (mocked)
-• User-specific alert management  
-• Kubernetes deployment  
+✔ Mock authentication endpoint - (Mocked login credentials, Kindly directly click on login to view the dashboard)
 
 ---
 

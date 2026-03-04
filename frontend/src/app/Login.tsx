@@ -40,7 +40,7 @@ export default function Login({ onLogin }: { onLogin: (token: string) => void })
         </div>
 
         <button style={{ width: "100%", padding: 10 }} type="submit">
-          Login
+          Login (click on login directly (Mocked Credentials))
         </button>
       </form>
       {error && <div style={{ marginTop: 10, color: "crimson" }}>{error}</div>}

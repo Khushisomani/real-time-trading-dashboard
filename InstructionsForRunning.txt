@@ -1,0 +1,129 @@
+REAL-TIME TRADING DASHBOARD
+===========================
+
+This project contains a full-stack application with:
+
+1. Backend (Node.js + Express + WebSocket)
+2. Frontend (React + Vite)
+
+The backend simulates market prices and streams updates via WebSocket.
+The frontend visualizes the data in real-time.
+
+----------------------------------------------------
+
+PREREQUISITES
+
+Make sure the following are installed:
+
+Node.js >= 18
+npm >= 9
+
+Verify with:
+
+node -v
+npm -v
+
+----------------------------------------------------
+
+STEP 1 — RUN BACKEND
+
+Open a terminal and navigate to the backend folder:
+
+cd backend
+
+Install dependencies:
+
+npm install
+
+Start the backend server:
+
+npm run dev
+
+Backend will start at:
+
+http://localhost:8080
+
+WebSocket endpoint:
+
+ws://localhost:8080/ws
+
+----------------------------------------------------
+
+STEP 2 — RUN FRONTEND
+
+Open another terminal and navigate to the frontend folder:
+
+cd frontend
+
+Install dependencies:
+
+npm install
+
+Start the frontend server:
+
+npm run dev
+
+Frontend will start at:
+
+http://localhost:5173
+
+----------------------------------------------------
+
+STEP 3 — OPEN APPLICATION
+
+Open the browser and visit:
+
+http://localhost:5173
+
+You should see the Real-Time Trading Dashboard.
+
+----------------------------------------------------
+
+FEATURES TO TEST
+
+1. Real-time price updates
+   Prices update every second via WebSocket.
+
+2. Ticker selection
+   Click any ticker to change the chart.
+
+3. Price alerts
+   Set an alert threshold.
+   When the price crosses it, a notification appears.
+
+4. Chart updates
+   Chart updates live as new prices arrive.
+
+----------------------------------------------------
+
+RUNNING TESTS
+
+Backend tests are implemented using Vitest.
+
+To run tests:
+
+cd backend
+npm run test
+
+----------------------------------------------------
+
+NOTES
+
+• Market data is simulated (random walk).
+• Authentication is mocked.
+• Historical data is cached in memory.
+• Alerts are stored in memory per WebSocket client.
+
+----------------------------------------------------
+
+PROJECT STRUCTURE
+
+crypto_dashboard
+│
+├── backend
+│   └── Node.js API + WebSocket server
+│
+├── frontend
+│   └── React real-time dashboard
+│
+└── README.md
