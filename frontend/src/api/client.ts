@@ -6,11 +6,9 @@ export async function fetchTickers(): Promise<TickerSymbol[]> {
     const ticker = await fetch(`${API_BASE}/api/tickers`);
     try {
         const result = await ticker.json();
-        console.log(result)
         return result?.tickers;
 
-    } catch (err){
-        console.log(err)
+    } catch {
         throw new Error("Failed to fetch tickers");
     }
 }
@@ -28,7 +26,6 @@ export async function fetchSnapshots(): Promise<TickerSnapshot[]> {
 
 export async function fetchHistory(symbol: TickerSymbol, limit = 120): Promise<PricePoint[]> {
     const history = await fetch(`${API_BASE}/api/history/${encodeURIComponent(symbol)}?limit=${limit}`);
-    console.log(symbol)
     try {
        const result = await history.json();
        return result.points;

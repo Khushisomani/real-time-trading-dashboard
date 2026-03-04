@@ -50,7 +50,6 @@ export function useMarketWebSocket(
 
   useEffect(() => {
     const url = getWsUrl();
-    console.log("[WS] connecting to", url);
 
     const ws = new WebSocket(url);
     wsRef.current = ws;
