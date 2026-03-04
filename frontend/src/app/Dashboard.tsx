@@ -8,7 +8,6 @@ import { TickerList } from "../components/TickerList";
 import { Chart } from "../components/Chart";
 
 type AlertCondition = "above" | "below";
-
 const MAX_CHART_POINTS = 200;
 
 export default function Dashboard() {
@@ -16,10 +15,8 @@ export default function Dashboard() {
   const [selected, setSelected] = useState<TickerSymbol | null>(null);
   const [snapshots, setSnapshots] = useState<Record<string, TickerSnapshot>>({});
 
-  // ✅ chart points that will grow with live ticks
   const [chartPoints, setChartPoints] = useState<PricePoint[]>([]);
 
-  // Alerts
   const [alertCondition, setAlertCondition] = useState<AlertCondition>("above");
   const [alertThreshold, setAlertThreshold] = useState("");
   const [toast, setToast] = useState("");
@@ -45,19 +42,11 @@ export default function Dashboard() {
     };
   }, []);
 
-  // ✅ Stable event handler (prevents WS reconnect loop)
   const onWsEvent = useCallback((evt: { type?: string; message?: string }) => {
-    if (evt?.type === "alert_triggered") {
-      setToast(evt.message ?? "Alert triggered");
-    }
-    if (evt?.type === "error") {
-      setToast(evt.message ?? "WS error");
-    }
+    if (evt?.type === "alert_triggered") setToast(evt.message ?? "Alert triggered");
+    if (evt?.type === "error") setToast(evt.message ?? "WS error");
   }, []);
 
-  // ✅ WS update handler:
-  // 1) update ticker snapshots
-  // 2) if selected ticker update arrives → append to chartPoints so chart moves
   const onWsUpdate = useCallback(
     (updates: TickerSnapshot[]) => {
       setSnapshots((prev) => {
@@ -68,22 +57,16 @@ export default function Dashboard() {
 
       setChartPoints((prev) => {
         if (!selected) return prev;
-
         const u = updates.find((x) => x.symbol === selected);
         if (!u) return prev;
 
         const nextPoint: PricePoint = { ts: u.ts ?? Date.now(), price: u.price };
-
-        // avoid duplicating same timestamp in case of re-renders
         const last = prev[prev.length - 1];
+
         const merged =
           last && last.ts === nextPoint.ts ? [...prev.slice(0, -1), nextPoint] : [...prev, nextPoint];
 
-        // keep last N points
-        if (merged.length > MAX_CHART_POINTS) {
-          return merged.slice(merged.length - MAX_CHART_POINTS);
-        }
-        return merged;
+        return merged.length > MAX_CHART_POINTS ? merged.slice(-MAX_CHART_POINTS) : merged;
       });
     },
     [selected]
@@ -91,13 +74,9 @@ export default function Dashboard() {
 
   const { status: wsStatus, sendJson } = useMarketWebSocket(onWsUpdate, onWsEvent);
 
-  const { data: history, loading: histLoading, error: histError } = useTickerHistory(
-    selected ?? "BTC-USD",
-    160,
-    30_000
-  );
+  const { data: history, loading: histLoading, error: histError } =
+    useTickerHistory(selected ?? "BTC-USD", 160, 30_000);
 
-  // ✅ When ticker changes OR fresh history arrives, reset chartPoints to history
   useEffect(() => {
     setChartPoints(history ?? []);
   }, [selected, history]);
@@ -118,11 +97,7 @@ export default function Dashboard() {
 
     sendJson({
       type: "set_alert",
-      payload: {
-        ticker: selected,
-        condition: alertCondition,
-        threshold: th
-      }
+      payload: { ticker: selected, condition: alertCondition, threshold: th }
     });
 
     setToast(`Alert set: ${selected} ${alertCondition} ${th}`);
@@ -136,9 +111,7 @@ export default function Dashboard() {
       {toast && (
         <div className="banner">
           {toast}
-          <button style={{ marginLeft: 12 }} onClick={() => setToast("")}>
-            ×
-          </button>
+          <button onClick={() => setToast("")}>×</button>
         </div>
       )}
 
@@ -149,20 +122,20 @@ export default function Dashboard() {
           {histLoading && selected && <div className="banner">Loading history for {selected}…</div>}
           {histError && <div className="banner error">{histError}</div>}
 
-          {/* Price Alerts UI */}
-          <div className="card" style={{ marginBottom: 12 }}>
+          <div className="card">
+            <div className="section-title">Price Alerts</div>
 
-            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-              <div>
-                <div className="muted">Condition</div>
+            <div className="formRow">
+              <div className="field">
+                <label>Condition</label>
                 <select value={alertCondition} onChange={(e) => setAlertCondition(e.target.value as AlertCondition)}>
                   <option value="above">Above</option>
                   <option value="below">Below</option>
                 </select>
               </div>
 
-              <div>
-                <div className="muted">Threshold</div>
+              <div className="field">
+                <label>Threshold</label>
                 <input
                   value={alertThreshold}
                   onChange={(e) => setAlertThreshold(e.target.value)}
@@ -170,19 +143,33 @@ export default function Dashboard() {
                 />
               </div>
 
-              <div style={{ paddingTop: 18 }}>
+              <div className="field">
+                <label>&nbsp;</label>
                 <button onClick={onSetAlert} disabled={!selected || wsStatus !== "open"}>
                   Set Alert
                 </button>
               </div>
 
-              <div style={{ paddingTop: 18 }} className="muted">
+              <div className="liveLine">
                 Live: <b>{livePrice != null ? livePrice.toFixed(2) : "-"}</b>
               </div>
             </div>
-          </div>
 
-          <Chart symbol={selected} history={chartPoints} livePrice={livePrice} />
+            <div className="chartWrap">
+              <div className="chartHead">
+                <div className="left">
+                  <div className="sym">{selected ?? "-"}</div>
+                  <div className="price">{livePrice != null ? livePrice.toFixed(2) : "--"}</div>
+                </div>
+                <div className="pill">
+                  <span className={`dot ${wsStatus}`} />
+                  WS: <b style={{ color: "var(--text)" }}>{wsStatus}</b>
+                </div>
+              </div>
+
+              <Chart symbol={selected} history={chartPoints} livePrice={livePrice} />
+            </div>
+          </div>
         </div>
       </div>
     </div>

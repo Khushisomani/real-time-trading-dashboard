@@ -1,3 +1,4 @@
+import React from "react";
 import { TickerSnapshot, TickerSymbol } from "../api/types";
 
 export function TickerList({
@@ -8,36 +9,34 @@ export function TickerList({
 }: {
   tickers: TickerSymbol[];
   selected: TickerSymbol | null;
-  snapshots: Record<string, TickerSnapshot | undefined>;
+  snapshots: Record<string, TickerSnapshot>;
   onSelect: (s: TickerSymbol) => void;
 }) {
   return (
     <div className="card">
-      <div className="cardTitle">Tickers</div>
-      <div className="tickerList">
+      <div className="section-title">Tickers</div>
+
+      <div className="tickers">
         {tickers.map((t) => {
           const snap = snapshots[t];
-          const isSel = selected === t;
+          const chg = snap?.change24hPct ?? 0;
+          const chgCls = chg >= 0 ? "chg pos" : "chg neg";
+
           return (
-            <button
+            <div
               key={t}
-              className={`tickerRow ${isSel ? "active" : ""}`}
+              className={`ticker ${selected === t ? "selected" : ""}`}
               onClick={() => onSelect(t)}
+              role="button"
+              tabIndex={0}
             >
-              <div className="tickerLeft">
-                <div className="tickerSymbol">{t}</div>
-                <div className="tickerMeta">
-                  24h:{" "}
-                  <span className={snap && snap.change24hPct >= 0 ? "pos" : "neg"}>
-                    {snap ? `${snap.change24hPct.toFixed(2)}%` : "--"}
-                  </span>
-                </div>
+              <div className="sym">{t}</div>
+              <div className="chgLine">
+                <span className={chgCls}>24h: {snap ? `${chg.toFixed(2)}%` : "--"}</span>
               </div>
-              <div className="tickerRight">
-                <div className="tickerPrice">{snap ? snap.price.toFixed(2) : "--"}</div>
-                <div className="tickerTs">{snap ? new Date(snap.ts).toLocaleTimeString() : ""}</div>
-              </div>
-            </button>
+              <div className="px">{snap ? snap.price.toFixed(2) : "--"}</div>
+              <div className="muted">{snap ? new Date(snap.ts).toLocaleTimeString() : "--"}</div>
+            </div>
           );
         })}
       </div>
