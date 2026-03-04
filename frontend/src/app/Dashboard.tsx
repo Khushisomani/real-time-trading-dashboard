@@ -151,9 +151,6 @@ export default function Dashboard() {
 
           {/* Price Alerts UI */}
           <div className="card" style={{ marginBottom: 12 }}>
-            <div style={{ fontWeight: 700, marginBottom: 8 }}>
-              Price Alerts <span className="muted" style={{ marginLeft: 8 }}>WS: {wsStatus}</span>
-            </div>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <div>
