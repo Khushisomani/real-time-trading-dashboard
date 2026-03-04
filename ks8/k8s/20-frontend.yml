@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-frontend
+  namespace: crypto-dashboard
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crypto-frontend
+  template:
+    metadata:
+      labels:
+        app: crypto-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: YOUR_DOCKERHUB/crypto-frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crypto-frontend-svc
+  namespace: crypto-dashboard
+spec:
+  type: ClusterIP
+  selector:
+    app: crypto-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
