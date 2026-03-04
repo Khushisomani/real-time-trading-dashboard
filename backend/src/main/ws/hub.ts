@@ -1,44 +1,99 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { TickerSnapshot } from "../main/market/types.js";
+import { MarketData } from "../market/marketData.js";
+import { TickerSymbol, TickerSnapshot } from "../market/types.js";
 
-type Client = WebSocket & { isAlive?: boolean };
+type Alert = {
+  ticker: TickerSymbol;
+  condition: "above" | "below";
+  threshold: number;
+};
 
-export class WsHub {
-  private wss: WebSocketServer;
+const clientAlerts = new Map<WebSocket, Alert[]>();
 
-  constructor(wss: WebSocketServer) {
-    this.wss = wss;
+export function attachWsHub(wss: WebSocketServer, market: MarketData, tickMs = 1000) {
+  wss.on("connection", (ws) => {
+    clientAlerts.set(ws, []);
 
-    // heartbeat
-    const interval = setInterval(() => {
-      this.wss.clients.forEach((ws) => {
-        const c = ws as Client;
-        if (c.isAlive === false) return c.terminate();
-        c.isAlive = false;
-        c.ping();
-      });
-    }, 30000);
+    ws.on("message", (raw) => {
+      let msg: any;
+      try {
+        msg = JSON.parse(raw.toString());
+      } catch {
+        ws.send(JSON.stringify({ type: "error", message: "Invalid JSON" }));
+        return;
+      }
 
-    this.wss.on("close", () => clearInterval(interval));
+      if (msg.type === "subscribe") {
+        ws.send(JSON.stringify({ type: "connected" }));
+        return;
+      }
 
-    this.wss.on("connection", (ws) => {
-      const c = ws as Client;
-      c.isAlive = true;
-      ws.on("pong", () => { c.isAlive = true; });
+      if (msg.type === "set_alert") {
+        const p = msg.payload ?? {};
+        const valid =
+          typeof p.ticker === "string" &&
+          (p.condition === "above" || p.condition === "below") &&
+          typeof p.threshold === "number";
 
-      ws.on("message", (data) => {
-        // Optional: could accept subscribe messages later
-        // Keep it simple: broadcast-only feed.
-        void data;
-      });
+        if (!valid) {
+          ws.send(JSON.stringify({ type: "error", message: "Invalid alert payload" }));
+          return;
+        }
+
+        const alerts = clientAlerts.get(ws) ?? [];
+        alerts.push({ ticker: p.ticker, condition: p.condition, threshold: p.threshold });
+        clientAlerts.set(ws, alerts);
+
+        ws.send(JSON.stringify({ type: "alert_set", message: "Alert registered" }));
+      }
     });
-  }
 
-  broadcastTickerUpdates(updates: TickerSnapshot[]) {
-    const payload = JSON.stringify({ type: "TICKER_UPDATE", data: updates });
-
-    this.wss.clients.forEach((ws) => {
-      if (ws.readyState === WebSocket.OPEN) ws.send(payload);
+    ws.on("close", () => {
+      clientAlerts.delete(ws);
     });
-  }
+  });
+
+  setInterval(() => {
+    const updates: TickerSnapshot[] = market.step();
+
+    // broadcast prices
+    const payload = JSON.stringify({ type: "price_update", data: updates });
+    wss.clients.forEach((c) => {
+      if (c.readyState === WebSocket.OPEN) c.send(payload);
+    });
+
+    // check alerts per client
+    wss.clients.forEach((ws) => {
+      if (ws.readyState !== WebSocket.OPEN) return;
+
+      const alerts = clientAlerts.get(ws) ?? [];
+      if (alerts.length === 0) return;
+
+      const remaining: Alert[] = [];
+
+      for (const a of alerts) {
+        const u = updates.find((x) => x.symbol === a.ticker);
+        if (!u) {
+          remaining.push(a);
+          continue;
+        }
+
+        const triggered = a.condition === "above" ? u.price >= a.threshold : u.price <= a.threshold;
+
+        if (triggered) {
+          ws.send(
+            JSON.stringify({
+              type: "alert_triggered",
+              message: `${a.ticker} crossed ${a.condition} ${a.threshold}. Current: ${u.price}`,
+              data: { ...a, currentPrice: u.price, ts: Date.now() }
+            })
+          );
+        } else {
+          remaining.push(a);
+        }
+      }
+
+      clientAlerts.set(ws, remaining);
+    });
+  }, tickMs);
 }

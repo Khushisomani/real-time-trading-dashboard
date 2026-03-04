@@ -11,3 +11,10 @@ export type PricePoint = {
     change24hPct: number;
     ts: number;
   };
+
+export  type Alert = {
+    ticker: TickerSymbol;
+    condition: "above" | "below";
+    threshold: number;
+  };
+  
